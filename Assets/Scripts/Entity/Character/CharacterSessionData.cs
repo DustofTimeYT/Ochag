@@ -1,3 +1,4 @@
+using AttackingEntity;
 using UnityEngine;
 
 namespace Character
