@@ -1,4 +1,7 @@
 ﻿
+/// <summary>
+/// Контракт для чтения боевых характеристик атакующей сущности.
+/// </summary>
 public interface IStatsReadonly
 {
     public int Armor { get; }

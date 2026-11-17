@@ -3,6 +3,10 @@ using UnityEngine;
 
 namespace AttackingEntity
 {
+    /// <summary>
+    /// Базовый абстрактный класс правил для атакующих существ.
+    /// Наследует <see cref="EntityGameLogic"/>.
+    /// </summary>
     public abstract class AttackingEntityGameLogic : EntityGameLogic
     {
         public void AddAgility(AttackingEntitySessionData data, int amount)

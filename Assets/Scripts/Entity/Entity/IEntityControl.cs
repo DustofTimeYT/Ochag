@@ -1,4 +1,9 @@
 
+/// <summary>
+/// Контракт для взаимодействия контроллера с моделью сущности
+/// (<see cref="EntityModel{TSessionData, TGameLogic}"/>).
+/// Наследует <see cref="IHPReadonly"/>.
+/// </summary>
 public interface IEntityControl: IHPReadonly
 {
     public float MaxSpeed { get; }
