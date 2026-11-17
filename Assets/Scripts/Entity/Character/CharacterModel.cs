@@ -1,11 +1,9 @@
 using UnityEngine;
 using Character;
 
-public class CharacterModel : AttackingEntityModel<CharacterSessionData, CharacterGameLogic>
+public class CharacterModel : AttackingEntityModel<CharacterSessionData, CharacterGameLogic>, ICharacterControl
 {
-    public CharacterModel()
+    public CharacterModel(CharacterSessionData sessionData, CharacterGameLogic gameLogic) : base(sessionData, gameLogic)
     {
-        _sessionData = new CharacterSessionData();
-        _gameLogic = new CharacterGameLogic();
     }
 }
