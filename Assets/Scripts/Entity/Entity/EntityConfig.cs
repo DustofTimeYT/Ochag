@@ -1,0 +1,20 @@
+﻿using UnityEngine;
+
+/// <summary>
+/// Абстрактная конфигурация для настройки существ в инспекторе
+/// </summary>
+public abstract class EntityConfig : ScriptableObject
+{
+    // _localizationKey будет использоваться для локализации. Если нужно имя то использовать имя файла *.name
+    [SerializeField] private string _localizationKey;
+    public string LocalizationKey => _localizationKey;
+
+    [SerializeField] private int _maxHP;
+    public int MaxHP => _maxHP;
+
+    [SerializeField] private float _maxSpeed;
+    public float MaxSpeed => _maxSpeed;
+
+    [SerializeField] private float _maxJumpHeight;
+    public float MaxJumpHeight => _maxJumpHeight;
+}
