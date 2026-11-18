@@ -1,5 +1,4 @@
-﻿
-/// <summary>
+﻿/// <summary>
 /// Контракт для взаимодействия контроллера с моделью атакующей сущности
 /// (<see cref="AttackingEntityModel{TSessionData, TGameLogic}"/>).
 /// Наследует <see cref="IStatsReadonly"/>.
