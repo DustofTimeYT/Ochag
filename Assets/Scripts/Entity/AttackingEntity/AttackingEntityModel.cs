@@ -3,11 +3,11 @@ using AttackingEntity;
 /// <summary>
 /// Абстрактный фасад для связи логики и данных сессии атакующих существ с остальной системой.
 /// Наследует <see cref="EntityModel{TSessionData, TGameLogic}"/>.
-/// Реализует <see cref="IAttackingEntityControl"/>.
+/// Реализует <see cref="IAttackingEntityControl"/>, <see cref="IStatsReadonly"/>.
 /// </summary>
 /// <typeparam name="TSessionData">Тип данных сессии (наследник <see cref="AttackingEntitySessionData"/>).</typeparam>
 /// <typeparam name="TGameLogic">Тип игровой логики (наследник <see cref="AttackingEntityGameLogic"/>).</typeparam>
-public abstract class AttackingEntityModel<TSessionData, TGameLogic> : EntityModel<TSessionData, TGameLogic>, IAttackingEntityControl
+public abstract class AttackingEntityModel<TSessionData, TGameLogic> : EntityModel<TSessionData, TGameLogic>, IAttackingEntityControl, IStatsReadonly
     where TSessionData : AttackingEntitySessionData
     where TGameLogic : AttackingEntityGameLogic
 {

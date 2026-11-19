@@ -4,11 +4,11 @@ using UnityEngine;
 
 /// <summary>
 /// Абстрактный фасад для связи логики и данных сессии существ с остальной системой.
-/// Реализует <see cref="IEntityControl"/>.
+/// Реализует <see cref="IEntityControl"/>, <see cref="IHPReadonly"/>.
 /// </summary>
 /// <typeparam name="TSessionData">Тип данных сессии (наследник <see cref="EntitySessionData"/>).</typeparam>
 /// <typeparam name="TGameLogic">Тип игровой логики (наследник <see cref="EntityGameLogic"/>).</typeparam>
-public abstract class EntityModel<TSessionData, TGameLogic> : IEntityControl 
+public abstract class EntityModel<TSessionData, TGameLogic> : IEntityControl, IHPReadonly
     where TSessionData : EntitySessionData
     where TGameLogic : EntityGameLogic
 {
