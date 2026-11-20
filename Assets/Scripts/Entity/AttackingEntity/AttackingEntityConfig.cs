@@ -2,6 +2,7 @@
 
 /// <summary>
 /// Абстрактная конфигурация для настройки атакующих существ в инспекторе
+/// (<see cref="EntityConfig"/>).
 /// </summary>
 public abstract class AttackingEntityConfig : EntityConfig
 {
