@@ -12,8 +12,9 @@ namespace Entity
         public int MaxHP { get; set; }
         public int CurrentHP { get; set; }
 
-        public float MaxSpeed { get; set; }
-
+        public float MaxWalkingSpeed { get; set; }
+        public float MaxRunningSpeed { get; set; }
+        public float MaxSprintingSpeed { get; set; }
         public float MaxJumpHeight { get; set; }
     }
 }

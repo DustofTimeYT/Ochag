@@ -4,11 +4,11 @@ using UnityEngine;
 
 /// <summary>
 /// Абстрактный фасад для связи логики и данных сессии существ с остальной системой.
-/// Реализует <see cref="IEntityControl"/>, <see cref="IHPReadonly"/>.
+/// Реализует <see cref="IMoveControl"/>, <see cref="IHPReadonly"/>.
 /// </summary>
 /// <typeparam name="TSessionData">Тип данных сессии (наследник <see cref="EntitySessionData"/>).</typeparam>
 /// <typeparam name="TGameLogic">Тип игровой логики (наследник <see cref="EntityGameLogic"/>).</typeparam>
-public abstract class EntityModel<TSessionData, TGameLogic> : IEntityControl, IHPReadonly
+public abstract class EntityModel<TSessionData, TGameLogic> : IMoveControl, ITickable, IHPReadonly
     where TSessionData : EntitySessionData
     where TGameLogic : EntityGameLogic
 {
@@ -24,8 +24,19 @@ public abstract class EntityModel<TSessionData, TGameLogic> : IEntityControl, IH
     public int MaxHP => _sessionData.MaxHP;
     public int CurrentHP => _sessionData.CurrentHP;
 
-    public float MaxSpeed => _sessionData.MaxSpeed;    
+    public float MaxWalkingSpeed => _sessionData.MaxWalkingSpeed;
+    public float MaxRunningSpeed => _sessionData.MaxRunningSpeed;
+    public float MaxSprintingSpeed => _sessionData.MaxSprintingSpeed;
 
     public float MaxJumpHeight => _sessionData.MaxJumpHeight;
 
+    public void Tick(float deltaTime)
+    {
+        //throw new NotImplementedException();
+    }
+
+    public bool TryJump()
+    {
+        return true;
+    }
 }
