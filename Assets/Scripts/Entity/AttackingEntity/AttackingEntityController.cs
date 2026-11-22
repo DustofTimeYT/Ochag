@@ -4,7 +4,7 @@ using UnityEngine;
 /// Абстрактный контроллер для атакующих существ (база для наследования).
 /// Наследует <see cref="EntityController"/>.
 /// </summary>
-public abstract class AttackingEntityController : EntityController
+public abstract class AttackingEntityController 
 {
 
 }
