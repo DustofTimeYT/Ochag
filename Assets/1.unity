@@ -232,85 +232,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &683043324 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 3ff37aebd460736459f10eb82f44656d, type: 3}
-  m_PrefabInstance: {fileID: 1785002814}
-  m_PrefabAsset: {fileID: 0}
---- !u!143 &683043328
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 683043324}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.5
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1.05, z: 0}
---- !u!114 &683043331
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 683043324}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0630f02d58d551b45af84055b099c82a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  _characterController: {fileID: 683043328}
-  _gravity: -20
-  _groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  _checkRadius: 0.05
-  _groundCheckOffset: 0.087
---- !u!114 &683043332
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 683043324}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
-  m_Actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  m_NotificationBehavior: 0
-  m_UIInputModule: {fileID: 0}
-  m_DeviceLostEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_DeviceRegainedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ControlsChangedEvent:
-    m_PersistentCalls:
-      m_Calls: []
-  m_ActionEvents: []
-  m_NeverAutoSwitchControlSchemes: 0
-  m_DefaultControlScheme: Keyboard&Mouse
-  m_DefaultActionMap: 
-  m_SplitScreenIndex: -1
-  m_Camera: {fileID: 0}
 --- !u!1 &693134865
 GameObject:
   m_ObjectHideFlags: 0
@@ -369,7 +290,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneInstaller
   characterConfig: {fileID: 11400000, guid: aabd6fd14e227f0488834ade56571231, type: 2}
-  playerController: {fileID: 683043331}
+  playerController: {fileID: 1414505527}
 --- !u!1 &1015159550
 GameObject:
   m_ObjectHideFlags: 0
@@ -693,19 +614,103 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 070a961fabc79b349ab7f77c28538fb8, type: 3}
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3ff37aebd460736459f10eb82f44656d, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 070a961fabc79b349ab7f77c28538fb8, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 683043328}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3ff37aebd460736459f10eb82f44656d, type: 3}
+      addedObject: {fileID: 1414505528}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 070a961fabc79b349ab7f77c28538fb8, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 683043331}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3ff37aebd460736459f10eb82f44656d, type: 3}
+      addedObject: {fileID: 1414505527}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 070a961fabc79b349ab7f77c28538fb8, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 683043332}
-  m_SourcePrefab: {fileID: 100100000, guid: 3ff37aebd460736459f10eb82f44656d, type: 3}
+      addedObject: {fileID: 1414505526}
+  m_SourcePrefab: {fileID: 100100000, guid: 070a961fabc79b349ab7f77c28538fb8, type: 3}
+--- !u!1 &1414505523 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 070a961fabc79b349ab7f77c28538fb8, type: 3}
+  m_PrefabInstance: {fileID: 1147930036}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1414505524 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: 070a961fabc79b349ab7f77c28538fb8, type: 3}
+  m_PrefabInstance: {fileID: 1147930036}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1414505526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1414505523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
+  m_Actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Keyboard&Mouse
+  m_DefaultActionMap: 
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
+--- !u!114 &1414505527
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1414505523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0630f02d58d551b45af84055b099c82a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerController
+  _animator: {fileID: 1414505524}
+  _characterController: {fileID: 1414505528}
+  _gravity: -20
+  _rotationSpeed: 10
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  _checkRadius: 0.05
+  _groundCheckOffset: 0.087
+--- !u!143 &1414505528
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1414505523}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.5
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1.05, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -714,3 +719,4 @@ SceneRoots:
   - {fileID: 1076181532}
   - {fileID: 632092979}
   - {fileID: 1147930036}
+  - {fileID: 693134867}

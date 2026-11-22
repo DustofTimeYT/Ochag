@@ -12,15 +12,15 @@ public abstract class EntityConfig : ScriptableObject
     [SerializeField] private int _maxHP;
     public int MaxHP => _maxHP;
 
-    [SerializeField] private float _maxWalkingSpeed;
+    [Range(0f, 50f)][SerializeField] private float _maxWalkingSpeed;
     public float MaxWalkingSpeed => _maxWalkingSpeed;
 
-    [SerializeField] private float _maxRunningSpeed;
+    [Range(0f, 50f)][SerializeField] private float _maxRunningSpeed;
     public float MaxRunningSpeed => _maxRunningSpeed;
 
-    [SerializeField] private float _maxSprintingSpeed;
+    [Range(0f, 50f)][SerializeField] private float _maxSprintingSpeed;
     public float MaxSprintingSpeed => _maxSprintingSpeed;
 
-    [SerializeField] private float _maxJumpHeight;
+    [Range(0f, 50f)][SerializeField] private float _maxJumpHeight;
     public float MaxJumpHeight => _maxJumpHeight;
 }
