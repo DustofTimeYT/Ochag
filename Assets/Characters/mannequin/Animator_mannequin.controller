@@ -339,8 +339,8 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: Y
     m_Mirror: 0
-  m_BlendParameter: Y
-  m_BlendParameterY: X
+  m_BlendParameter: V
+  m_BlendParameterY: H
   m_MinThreshold: 0
   m_MaxThreshold: 1
   m_UseAutomaticThresholds: 1
@@ -439,7 +439,7 @@ AnimatorStateTransition:
     m_ConditionEvent: Jump
     m_EventTreshold: 0
   - m_ConditionMode: 3
-    m_ConditionEvent: X
+    m_ConditionEvent: H
     m_EventTreshold: 0.01
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -2808145324453005986}
@@ -490,7 +490,7 @@ AnimatorController:
     m_Type: 4
     m_DefaultFloat: 0
     m_DefaultInt: 0
-    m_DefaultBool: 1
+    m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
   - m_Name: BTL
     m_Type: 4
@@ -498,13 +498,13 @@ AnimatorController:
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
-  - m_Name: X
+  - m_Name: H
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
     m_DefaultBool: 0
     m_Controller: {fileID: 9100000}
-  - m_Name: Y
+  - m_Name: V
     m_Type: 1
     m_DefaultFloat: 0
     m_DefaultInt: 0
@@ -825,10 +825,10 @@ AnimatorStateMachine:
     m_Position: {x: 100, y: -330, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -7285638241902129666}
-    m_Position: {x: 470, y: 280, z: 0}
+    m_Position: {x: 530, y: 280, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 3697361161242035525}
-    m_Position: {x: 470, y: 330, z: 0}
+    m_Position: {x: 530, y: 330, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -8124296149438641706}
     m_Position: {x: -120, y: 400, z: 0}
@@ -953,8 +953,8 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: Y
     m_Mirror: 0
-  m_BlendParameter: Y
-  m_BlendParameterY: X
+  m_BlendParameter: V
+  m_BlendParameterY: H
   m_MinThreshold: 0
   m_MaxThreshold: 1
   m_UseAutomaticThresholds: 1
@@ -1022,7 +1022,7 @@ AnimatorStateTransition:
     m_ConditionEvent: Jump
     m_EventTreshold: 0
   - m_ConditionMode: 4
-    m_ConditionEvent: X
+    m_ConditionEvent: H
     m_EventTreshold: 0.01
   m_DstStateMachine: {fileID: 0}
   m_DstState: {fileID: -2977648112806032382}
