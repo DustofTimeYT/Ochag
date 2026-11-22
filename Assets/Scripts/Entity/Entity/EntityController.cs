@@ -7,8 +7,12 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public abstract class EntityController : MonoBehaviour
 {
+    [SerializeField] protected Animator _animator;
     [SerializeField] protected CharacterController _characterController;
     [SerializeField] private float _gravity = -20f;
+
+    [Range(1f, 50f)]
+    [SerializeField] private float _rotationSpeed = 10f;
 
     [Header("Настройки проверки земли")]
 
@@ -42,6 +46,7 @@ public abstract class EntityController : MonoBehaviour
 
     private void Start()
     {
+        this.CheckComponent(ref _animator);
         this.CheckComponent(ref _characterController);
     }
 
@@ -121,13 +126,40 @@ public abstract class EntityController : MonoBehaviour
 
     private void Move()
     {
+        if (ConsumeWalkingInput())
+        {
+            _animator.SetBool("sprint", false);
+            _animator.SetBool("walking", true);
+            Move(MoveControl.MaxWalkingSpeed);
+        }
+        else if (ConsumeSprintingInput())
+        {
+            _animator.SetBool("sprint", true);
+            _animator.SetBool("walking", false);
+            Move(MoveControl.MaxSprintingSpeed);
+        }
+        else
+        {
+            _animator.SetBool("sprint", false);
+            _animator.SetBool("walking", false);
+            Move(MoveControl.MaxRunningSpeed);
+        }
+
+    }
+
+    private void Move(float speed)
+    {
+        _animator.SetBool("Runing", true); //удалить
         // поворачиваем энтити по направлению движения
         Vector3 dir = GetMoveDirection();
         if (dir.sqrMagnitude > 0.01f)
-            transform.forward = dir;
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+        }
 
         // перемещаем энтити
-        Vector3 movement = dir * MoveControl.MaxRunningSpeed;
+        Vector3 movement = dir * speed;
         movement.y = _verticalVelocity;
         _characterController.Move(movement * Time.deltaTime);
     }
@@ -143,4 +175,8 @@ public abstract class EntityController : MonoBehaviour
     /// </summary>
     /// <returns>Совершать прыжок?</returns>
     protected virtual bool ConsumeJumpInput() => false;
+
+    protected virtual bool ConsumeWalkingInput() => false;
+
+    protected virtual bool ConsumeSprintingInput() => false;
 }

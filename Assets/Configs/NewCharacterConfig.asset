@@ -14,9 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CharacterConfig
   _localizationKey: 
   _maxHP: 50
-  _maxWalkingSpeed: 10
-  _maxRunningSpeed: 20
-  _maxSprintingSpeed: 30
+  _maxWalkingSpeed: 3
+  _maxRunningSpeed: 7
+  _maxSprintingSpeed: 10
   _maxJumpHeight: 4
   _armor: 1
   _strength: 1
