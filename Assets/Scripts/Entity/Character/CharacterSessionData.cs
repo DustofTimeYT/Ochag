@@ -1,13 +1,13 @@
-using AttackingEntity;
+using Entity;
 using UnityEngine;
 
 namespace Character
 {
     /// <summary>
     /// Класс, хранящий данные игровой сессии, присущие персонажу.
-    /// Наследует <see cref="AttackingEntitySessionData"/>.
+    /// Наследует <see cref="EntitySessionData"/>.
     /// </summary>
-    public class CharacterSessionData : AttackingEntitySessionData
+    public class CharacterSessionData : EntitySessionData
     {
 
     }

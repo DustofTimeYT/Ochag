@@ -16,6 +16,7 @@ public class SceneInstaller : MonoBehaviour, IInstaller
             MaxHP = characterConfig.MaxHP,
             CurrentHP = characterConfig.MaxHP,
             MaxStamina = characterConfig.MaxStamina,
+            CurrentStamina = characterConfig.MaxStamina,
             MaxWalkingSpeed = characterConfig.MaxWalkingSpeed,
             MaxRunningSpeed = characterConfig.MaxRunningSpeed,
             MaxSprintingSpeed = characterConfig.MaxSprintingSpeed,

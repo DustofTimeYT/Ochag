@@ -16,10 +16,11 @@ public class PlayerController : EntityController
 
     private void Awake() => _cam = Camera.main.transform;
 
+    // Получение пользователского ввода
     private void OnMove(InputValue value) => _moveInput = value.Get<Vector2>();
     private void OnJump(InputValue value) { if (value.isPressed) _jumpPressed = true; }
-    private void OnWalk(InputValue value) => _walkPressed = value.isPressed; //{ if (value.isPressed) _walkPressed = true; }
-    private void OnSprint(InputValue value) => _sprintPressed = value.isPressed; //{ if (value.isPressed) _sprintPressed = true; }
+    private void OnWalk(InputValue value) => _walkPressed = value.isPressed;
+    private void OnSprint(InputValue value) => _sprintPressed = value.isPressed;
 
     protected override Vector3 GetMoveDirection()
     {
@@ -38,7 +39,6 @@ public class PlayerController : EntityController
     {
         if (!_jumpPressed) return false;
         _jumpPressed = false;
-        Debug.Log(_jumpPressed);
         return true;
     }
 
