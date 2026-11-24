@@ -2,10 +2,10 @@
 
 /// <summary>
 /// Конфигурация для настройки персонажа в инспекторе
-/// (<see cref="AttackingEntityConfig"/>).
+/// (<see cref="EntityConfig"/>).
 /// </summary>
 [CreateAssetMenu(fileName = "NewCharacterConfig", menuName = "Configs/CharacterConfig")]
-public class CharacterConfig : AttackingEntityConfig
+public class CharacterConfig : EntityConfig
 {
     // Тут будут анимации
 }

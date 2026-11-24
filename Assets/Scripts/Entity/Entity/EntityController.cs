@@ -44,19 +44,33 @@ public abstract class EntityController : MonoBehaviour
         Tickable = tickable;
     }
 
-    private void Start()
+    /// <summary>
+    /// Инициализирует и валидирует обязательные ссылки на компоненты перед началом работы контроллера.
+    /// При отсутствии критических компонентов отключает выполнение скрипта.
+    /// </summary>
+    protected virtual void Awake()
     {
-        this.CheckComponent(ref _animator);
-        this.CheckComponent(ref _characterController);
+        if (!CheckValidRef())
+        {
+            enabled = false;
+            return;
+        }
     }
 
-    private void FixedUpdate()
+    /// <summary>
+    /// Проверяет наличие всех обязательных компонентов на текущем или дочерних объектах.
+    /// </summary>
+    /// <returns><see langword="true"/>, если все компоненты найдены; иначе — <see langword="false"/>.</returns>
+    private bool CheckValidRef()
     {
-        Locomotion();
+        return
+            this.CheckComponentInChildren(ref _animator) &
+            this.CheckComponent(ref _characterController);
     }
 
     private void Update()
     {
+        Locomotion();
         Tick();
     }
 
@@ -113,45 +127,62 @@ public abstract class EntityController : MonoBehaviour
 
     private void Jump()
     {
+        bool isOnGround = GroundCheck();
         // прижимаем к земле энтити
-        if (GroundCheck() && _verticalVelocity < 0f)
+        if (isOnGround && _verticalVelocity < 0f)
+        {
             _verticalVelocity = -2f;
+        }
 
         // совершаем прыжок
-        if (GroundCheck() && ConsumeJumpInput() && MoveControl.TryJump())
+        if (isOnGround && ConsumeJumpInput())
+        {
+            _animator.SetTrigger(AnimatorParams.Jump);
             _verticalVelocity = Mathf.Sqrt(MoveControl.MaxJumpHeight * -2f * _gravity);
+        }
+
+        _animator.SetBool(AnimatorParams.IsGrounded, isOnGround);
 
         _verticalVelocity += _gravity * Time.deltaTime;
     }
 
     private void Move()
     {
+        Vector3 dir = GetMoveDirection();
+
+        if (ConsumeSprintingInput() && dir.sqrMagnitude > 0.01f) // Проверяем нажата ли кнопка спринта и движется ли энтити.
+        {
+            if (MoveControl.TrySprint(Time.deltaTime)) // Проверяем хватает ли стамины.
+            {
+                _animator.SetBool(AnimatorParams.Sprint, true);
+                Move(MoveControl.MaxSprintingSpeed, dir, 1);
+                return;
+            }
+        }
+        _animator.SetBool(AnimatorParams.Sprint, false);
+
         if (ConsumeWalkingInput())
         {
-            _animator.SetBool("sprint", false);
-            _animator.SetBool("walking", true);
-            Move(MoveControl.MaxWalkingSpeed);
-        }
-        else if (ConsumeSprintingInput())
-        {
-            _animator.SetBool("sprint", true);
-            _animator.SetBool("walking", false);
-            Move(MoveControl.MaxSprintingSpeed);
+            Move(MoveControl.MaxWalkingSpeed, dir, 0.2f);
         }
         else
         {
-            _animator.SetBool("sprint", false);
-            _animator.SetBool("walking", false);
-            Move(MoveControl.MaxRunningSpeed);
+            Move(MoveControl.MaxRunningSpeed, dir, 1);
         }
-
     }
 
-    private void Move(float speed)
+    /// <summary>
+    /// Для перемещения и поворота энтити на сцене.
+    /// </summary>
+    /// <param name="speed">Скорость перемещения энтити.</param>
+    /// <param name="stateDir"></param>
+    private void Move(float speed, Vector3 dir, float stateDir)
     {
-        _animator.SetBool("Runing", true); //удалить
         // поворачиваем энтити по направлению движения
-        Vector3 dir = GetMoveDirection();
+        //Vector3 dir = GetMoveDirection();
+
+        _animator.SetFloat(AnimatorParams.Horizontal, Mathf.Min(Mathf.Abs(dir.z) + Mathf.Abs(dir.x), stateDir));
+
         if (dir.sqrMagnitude > 0.01f)
         {
             Quaternion targetRotation = Quaternion.LookRotation(dir);
@@ -165,18 +196,26 @@ public abstract class EntityController : MonoBehaviour
     }
 
     /// <summary>
-    /// Получаем направление движения энтити, для его перемещения на сцене
+    /// Получаем направление движения, для перемещения на сцене.
     /// </summary>
-    /// <returns>вектор направления движения</returns>
+    /// <returns><see cref="Vector3"/>, вектор направления движения в диапазоне [-1;1].</returns>
     protected abstract Vector3 GetMoveDirection();
 
     /// <summary>
-    /// Получаем запрос на прыжок
+    /// Подтверждание прыжка от класса-наследника.
     /// </summary>
-    /// <returns>Совершать прыжок?</returns>
+    /// <returns><see langword="true"/>, если нужно совершить прыжок; иначе — <see langword="false"/>.</returns>
     protected virtual bool ConsumeJumpInput() => false;
 
+    /// <summary>
+    /// Подтверждание перехода на шаг от класса-наследника.
+    /// </summary>
+    /// <returns><see langword="true"/>, если нужно переключиться на шаг; иначе — <see langword="false"/>.</returns>
     protected virtual bool ConsumeWalkingInput() => false;
 
+    /// <summary>
+    /// Подтверждание перехода на спринт от класса-наследника.
+    /// </summary>
+    /// <returns><see langword="true"/>, если нужно переключиться на спринт; иначе — <see langword="false"/>.</returns>
     protected virtual bool ConsumeSprintingInput() => false;
 }

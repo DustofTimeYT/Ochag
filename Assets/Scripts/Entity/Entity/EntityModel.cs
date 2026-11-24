@@ -32,11 +32,11 @@ public abstract class EntityModel<TSessionData, TGameLogic> : IMoveControl, ITic
 
     public void Tick(float deltaTime)
     {
-        //throw new NotImplementedException();
+        _gameLogic.UpdateStaminaRegen(_sessionData, deltaTime);
     }
 
-    public bool TryJump()
+    public bool TrySprint(float deltaTime)
     {
-        return true;
+        return _gameLogic.TryConsumeSprintStamina(_sessionData, deltaTime);
     }
 }
