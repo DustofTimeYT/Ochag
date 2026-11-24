@@ -15,7 +15,10 @@ MonoBehaviour:
   _localizationKey: 
   _maxWalkingSpeed: 3
   _maxRunningSpeed: 7
-  _maxSprintingSpeed: 15
+  _maxSprintingSpeed: 10
   _maxJumpHeight: 2
-  _maxHP: 50
-  _maxStamina: 10
+  _maxHP: 150
+  _maxStamina: 100
+  _staminaRegen: 3
+  _sprintStaminaCost: 30
+  _staminaRecoveryThreshold: 0.2

@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 
 namespace Entity
 {
@@ -17,13 +18,13 @@ namespace Entity
             // Восстанавливаем стамину, если энтини не спринтит
             if (sessionData.CurrentStamina < sessionData.MaxStamina && sessionData.IsSprinting == false)
             {
-                sessionData.CurrentStamina = Math.Min(sessionData.MaxStamina, sessionData.CurrentStamina + 0.5f * deltaTime);
+                sessionData.CurrentStamina = Math.Min(sessionData.MaxStamina, sessionData.CurrentStamina + sessionData.StaminaRegen * deltaTime);
             }
 
             // Ограничиваем возможность спринта, пока не восстановиться часть стамины
-            if (sessionData.CurrentStamina > sessionData.MaxStamina * 0.6f)
+            if (sessionData.CurrentStamina > sessionData.MaxStamina * sessionData.StaminaRecoveryThreshold)
             {
-                sessionData.IsSprintTimeout = false;
+                sessionData.IsSprintCooldown = false;
             }
 
             // Сбрасываем флаг в конце кадра: если в следующем кадре TrySprint не вызовется, пойдёт регенен
@@ -40,15 +41,16 @@ namespace Entity
         public bool TryConsumeSprintStamina(EntitySessionData sessionData, float deltaTime)
         {
             // Уменьшаем стамину во время спринта
-            if (sessionData.CurrentStamina > 0 && !sessionData.IsSprintTimeout)
+            if (sessionData.CurrentStamina > 0 && !sessionData.IsSprintCooldown)
             {
-                sessionData.CurrentStamina = Math.Max(sessionData.CurrentStamina - 4f * deltaTime, 0);
+                sessionData.CurrentStamina = Math.Max(sessionData.CurrentStamina - sessionData.SprintStaminaCost * deltaTime, 0);
                 sessionData.IsSprinting = true;
                 return true;
             }
 
             // После уменьшения стамины в ноль активируем блокировку спринта
-            sessionData.IsSprintTimeout = true;
+            if (sessionData.CurrentStamina == 0)
+                sessionData.IsSprintCooldown = true;
             return false;
         }
     }

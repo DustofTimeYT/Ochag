@@ -12,6 +12,9 @@ namespace Entity
 
         public float MaxStamina { get; set; }
         public float CurrentStamina { get; set; }
+        public float StaminaRegen { get; set; }
+        public float SprintStaminaCost { get; set; }
+        public float StaminaRecoveryThreshold { get; set; }
 
         public float MaxWalkingSpeed { get; set; }
         public float MaxRunningSpeed { get; set; }
@@ -20,6 +23,6 @@ namespace Entity
         public float MaxJumpHeight { get; set; }
 
         public bool IsSprinting { get; set; } = false;
-        public bool IsSprintTimeout { get; set; } = false;
+        public bool IsSprintCooldown { get; set; } = false;
     }
 }

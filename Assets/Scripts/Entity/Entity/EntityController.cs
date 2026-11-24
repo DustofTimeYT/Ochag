@@ -44,10 +44,28 @@ public abstract class EntityController : MonoBehaviour
         Tickable = tickable;
     }
 
-    private void Start()
+    /// <summary>
+    /// Инициализирует и валидирует обязательные ссылки на компоненты перед началом работы контроллера.
+    /// При отсутствии критических компонентов отключает выполнение скрипта.
+    /// </summary>
+    protected virtual void Awake()
     {
-        this.CheckComponent(ref _animator);
-        this.CheckComponent(ref _characterController);
+        if (!CheckValidRef())
+        {
+            enabled = false;
+            return;
+        }
+    }
+
+    /// <summary>
+    /// Проверяет наличие всех обязательных компонентов на текущем или дочерних объектах.
+    /// </summary>
+    /// <returns><see langword="true"/>, если все компоненты найдены; иначе — <see langword="false"/>.</returns>
+    private bool CheckValidRef()
+    {
+        return
+            this.CheckComponentInChildren(ref _animator) &
+            this.CheckComponent(ref _characterController);
     }
 
     private void Update()
@@ -113,16 +131,17 @@ public abstract class EntityController : MonoBehaviour
         // прижимаем к земле энтити
         if (isOnGround && _verticalVelocity < 0f)
         {
-            _animator.SetBool("Jump", false);
             _verticalVelocity = -2f;
         }
 
         // совершаем прыжок
         if (isOnGround && ConsumeJumpInput())
         {
-            _animator.SetBool("Jump", true);
+            _animator.SetTrigger(AnimatorParams.Jump);
             _verticalVelocity = Mathf.Sqrt(MoveControl.MaxJumpHeight * -2f * _gravity);
         }
+
+        _animator.SetBool(AnimatorParams.IsGrounded, isOnGround);
 
         _verticalVelocity += _gravity * Time.deltaTime;
     }
@@ -135,12 +154,12 @@ public abstract class EntityController : MonoBehaviour
         {
             if (MoveControl.TrySprint(Time.deltaTime)) // Проверяем хватает ли стамины.
             {
-                _animator.SetBool("Sprint", true);
+                _animator.SetBool(AnimatorParams.Sprint, true);
                 Move(MoveControl.MaxSprintingSpeed, dir, 1);
                 return;
             }
         }
-        _animator.SetBool("Sprint", false);
+        _animator.SetBool(AnimatorParams.Sprint, false);
 
         if (ConsumeWalkingInput())
         {
@@ -162,7 +181,7 @@ public abstract class EntityController : MonoBehaviour
         // поворачиваем энтити по направлению движения
         //Vector3 dir = GetMoveDirection();
 
-        _animator.SetFloat("H", Mathf.Min(Mathf.Abs(dir.z) + Mathf.Abs(dir.x), stateDir));
+        _animator.SetFloat(AnimatorParams.Horizontal, Mathf.Min(Mathf.Abs(dir.z) + Mathf.Abs(dir.x), stateDir));
 
         if (dir.sqrMagnitude > 0.01f)
         {

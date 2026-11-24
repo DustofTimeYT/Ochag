@@ -14,7 +14,11 @@ public class PlayerController : EntityController
 
     private Transform _cam;
 
-    private void Awake() => _cam = Camera.main.transform;
+    protected override void Awake()
+    {
+        base.Awake();
+        _cam = Camera.main.transform;
+    }
 
     // Получение пользователского ввода
     private void OnMove(InputValue value) => _moveInput = value.Get<Vector2>();
