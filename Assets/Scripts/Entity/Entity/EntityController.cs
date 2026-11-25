@@ -1,4 +1,5 @@
 using Reflex.Attributes;
+using System.Collections;
 using UnityEngine;
 
 /// <summary>
@@ -7,12 +8,19 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public abstract class EntityController : MonoBehaviour
 {
+    [Header("Ссылки на контроллеры")]
     [SerializeField] protected Animator _animator;
     [SerializeField] protected CharacterController _characterController;
+    protected IMoveControl MoveControl { get; private set; }
+    protected ITickable Tickable { get; private set; }
+
+    [Header("Настройки физики")]
     [SerializeField] private float _gravity = -20f;
 
-    [Range(1f, 50f)]
-    [SerializeField] private float _rotationSpeed = 10f;
+    [Header("Настройки управления")]
+    [Range(1f, 50f)] [SerializeField] private float _rotationSpeed = 10f;
+    private float _verticalVelocity;
+    private bool _isPreparingJump;
 
     [Header("Настройки проверки земли")]
 
@@ -31,11 +39,7 @@ public abstract class EntityController : MonoBehaviour
     /// </summary>
     [Range(-0.5f, 0.5f)]
     [SerializeField] private float _groundCheckOffset = 0.05f;
-
-    protected IMoveControl MoveControl { get; private set; }
-
-    protected ITickable Tickable { get; private set; }
-    private float _verticalVelocity;
+    private bool _isRawGrounded;
 
     [Inject]
     public void Init(IMoveControl moveControl, ITickable tickable)
@@ -57,6 +61,14 @@ public abstract class EntityController : MonoBehaviour
         }
     }
 
+    protected virtual void Update()
+    {
+        Locomotion();
+        Tick();
+    }
+
+    // Вспомогательные методы
+
     /// <summary>
     /// Проверяет наличие всех обязательных компонентов на текущем или дочерних объектах.
     /// </summary>
@@ -66,12 +78,6 @@ public abstract class EntityController : MonoBehaviour
         return
             this.CheckComponentInChildren(ref _animator) &
             this.CheckComponent(ref _characterController);
-    }
-
-    private void Update()
-    {
-        Locomotion();
-        Tick();
     }
 
     private void Tick()
@@ -89,15 +95,7 @@ public abstract class EntityController : MonoBehaviour
         Jump();
     }
 
-    /// <summary>
-    /// Находит виртуальное положения сферы-чекера для проверки земли 
-    /// </summary>
-    /// <returns>Положение виртуальной сферы-чекера</returns>
-    private Vector3 GetGroundCheckPosition()
-    {
-        float bottomY = _characterController.center.y - (_characterController.height * 0.5f) + _checkRadius - _groundCheckOffset;
-        return transform.position + new Vector3(_characterController.center.x, bottomY, _characterController.center.z);
-    }
+    // Проверка земли
 
     /// <summary>
     /// Проверяет стоит ли энтити на земле
@@ -114,6 +112,16 @@ public abstract class EntityController : MonoBehaviour
     }
 
     /// <summary>
+    /// Находит виртуальное положения сферы-чекера для проверки земли 
+    /// </summary>
+    /// <returns>Положение виртуальной сферы-чекера</returns>
+    private Vector3 GetGroundCheckPosition()
+    {
+        float bottomY = _characterController.center.y - (_characterController.height * 0.5f) + _checkRadius - _groundCheckOffset;
+        return transform.position + new Vector3(_characterController.center.x, bottomY, _characterController.center.z);
+    }
+
+    /// <summary>
     /// Отрисовка сферы-чекера в окне Scene, чтобы визуально видеть зону проверки
     /// </summary>
     private void OnDrawGizmosSelected()
@@ -125,30 +133,50 @@ public abstract class EntityController : MonoBehaviour
         Gizmos.DrawWireSphere(GetGroundCheckPosition(), _checkRadius);
     }
 
+    // Обработка прыжка
+
     private void Jump()
     {
-        bool isOnGround = GroundCheck();
-        // прижимаем к земле энтити
-        if (isOnGround && _verticalVelocity < 0f)
+        _isRawGrounded = GroundCheck();
+
+        // Прижимаем к земле энтити
+        if (_isRawGrounded && _verticalVelocity < 0f)
         {
             _verticalVelocity = -2f;
         }
 
-        // совершаем прыжок
-        if (isOnGround && ConsumeJumpInput())
+        // 2. Разрешаем старт прыжка
+        if (_isRawGrounded && ConsumeJumpInput() && !_isPreparingJump)
         {
+            _isPreparingJump = true;
             _animator.SetTrigger(AnimatorParams.Jump);
-            _verticalVelocity = Mathf.Sqrt(MoveControl.MaxJumpHeight * -2f * _gravity);
         }
 
-        _animator.SetBool(AnimatorParams.IsGrounded, isOnGround);
-
+        _animator.SetBool(AnimatorParams.IsGrounded, _isRawGrounded);
         _verticalVelocity += _gravity * Time.deltaTime;
     }
 
+    /// <summary>
+    /// Вызывается через Animation Event в кадре отрыва ног от земли.
+    /// </summary>
+    public void OnJumpTakeoff()
+    {
+        if (!_isPreparingJump) return;
+
+        _isPreparingJump = false;
+        _verticalVelocity = Mathf.Sqrt(MoveControl.MaxJumpHeight * -2f * _gravity);
+    }
+
+    // Обработка движения
+
+    /// <summary>
+    /// Определение вида (шаг/бег/спринт) движения энтити
+    /// </summary>
     private void Move()
     {
         Vector3 dir = GetMoveDirection();
+
+        if (_isPreparingJump) return;
 
         if (ConsumeSprintingInput() && dir.sqrMagnitude > 0.01f) // Проверяем нажата ли кнопка спринта и движется ли энтити.
         {
@@ -181,7 +209,7 @@ public abstract class EntityController : MonoBehaviour
         // поворачиваем энтити по направлению движения
         //Vector3 dir = GetMoveDirection();
 
-        _animator.SetFloat(AnimatorParams.Horizontal, Mathf.Min(Mathf.Abs(dir.z) + Mathf.Abs(dir.x), stateDir));
+        _animator.SetFloat(AnimatorParams.Horizontal, Mathf.Min(Mathf.Abs(dir.z) + Mathf.Abs(dir.x), stateDir)); // неправильная скорость при передвижении боком
 
         if (dir.sqrMagnitude > 0.01f)
         {
@@ -194,6 +222,8 @@ public abstract class EntityController : MonoBehaviour
         movement.y = _verticalVelocity;
         _characterController.Move(movement * Time.deltaTime);
     }
+
+    // Виртуальные и абстрактные методы
 
     /// <summary>
     /// Получаем направление движения, для перемещения на сцене.
