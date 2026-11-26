@@ -28,9 +28,9 @@
                 },
                 {
                     "name": "Sprint",
-                    "type": "PassThrough",
+                    "type": "Button",
                     "id": "641cd816-40e6-41b4-8c3d-04687c349290",
-                    "expectedControlType": "Button",
+                    "expectedControlType": "",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false,
@@ -57,7 +57,7 @@
                     "priority": 0
                 },
                 {
-                    "name": "NextTarget",
+                    "name": "TargetLeft",
                     "type": "Button",
                     "id": "d9b2c59f-b1d9-46f1-b45a-bbbbe38fbf25",
                     "expectedControlType": "",
@@ -67,7 +67,7 @@
                     "priority": 0
                 },
                 {
-                    "name": "PreviousTarget",
+                    "name": "TargetRight",
                     "type": "Button",
                     "id": "dedb0424-5dd1-4208-8285-ab40023692d4",
                     "expectedControlType": "",
@@ -524,7 +524,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "NextTarget",
+                    "action": "TargetLeft",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -535,7 +535,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "NextTarget",
+                    "action": "TargetLeft",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -546,7 +546,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "PreviousTarget",
+                    "action": "TargetRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -557,7 +557,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "PreviousTarget",
+                    "action": "TargetRight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

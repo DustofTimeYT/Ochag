@@ -5,65 +5,91 @@ using UnityEngine.InputSystem;
 /// Контроллер персонажа. Отвечает за действия игрового объекта.
 /// Наследует <see cref="EntityController"/>.
 /// </summary>
+[RequireComponent(typeof(TargetSelector))]
 public class PlayerController : EntityController
 {
+    [Header("Ссылки на модули игрока")]
+    [SerializeField] private TargetSelector _targetSelector;
+
     [Tooltip("Скорость плавного разгона и разворота (6–10 — оптимально)")]
     [Range(3f, 25f)][SerializeField] private float _inputSmoothSpeed = 8f;
 
     [Tooltip("Скорость плавного торможения при отпускании клавиш (15–30 — оптимально)")]
     [Range(5f, 40f)][SerializeField] private float _inputStopSpeed = 20f;
 
-    private bool _jumpPressed;
-    private bool _walkPressed;
-    private bool _sprintPressed;
-    private bool _isBattleMode;
+    private bool _jumpPressed = false;
+    private bool _walkPressed = false;
+    private bool _sprintPressed = false;
 
     private Vector2 _rawMoveInput;
     private Vector2 _smoothedMoveInput;
-    private float _releaseBufferTimer;
 
     private Transform _cam;
+
     protected override void Awake()
     {
         base.Awake();
+
+        if (!enabled) return;
+
+        if (!this.CheckComponent(ref _targetSelector))
+        {
+            enabled = false;
+            return;
+        }
+
         _cam = Camera.main.transform;
+    }
+
+    protected override void Update()
+    {
+        if (_rawMoveInput.sqrMagnitude < 0.001f)
+        {
+            // Плавное затухание: даёт естественный микро-буфер при смене W -> S без лишних таймеров
+            _smoothedMoveInput = Vector2.MoveTowards(_smoothedMoveInput, Vector2.zero, _inputStopSpeed * Time.deltaTime);
+        }
+        else
+        {
+            Vector2 targetDir = _rawMoveInput.normalized;
+
+            if (_smoothedMoveInput.sqrMagnitude < 0.01f || Vector2.Dot(_smoothedMoveInput.normalized, targetDir) < -0.5f)
+            {
+                // Старт или разворот на 180° — сразу полная скорость
+                _smoothedMoveInput = targetDir;
+            }
+            else
+            {
+                // Плавный поворот под углом с сохранением полной скорости
+                Vector2 next = Vector2.MoveTowards(_smoothedMoveInput, targetDir, _inputSmoothSpeed * Time.deltaTime);
+                _smoothedMoveInput = next.sqrMagnitude > 0.001f ? next.normalized : targetDir;
+            }
+        }
+
+
+        base.Update();
     }
 
     // Получение пользователского ввода
     private void OnMove(InputValue value) => _rawMoveInput = value.Get<Vector2>();
     private void OnJump(InputValue value) { if (value.isPressed) _jumpPressed = true; }
     private void OnWalk(InputValue value) => _walkPressed = value.isPressed;
-    private void OnSprint(InputValue value) => _sprintPressed = value.isPressed;
-    private void OnLockTarget(InputValue value) { if (value.isPressed) _isBattleMode = !_isBattleMode; }
-
-    protected override void Update()
+    private void OnSprint(InputValue value) { if (value.isPressed) _sprintPressed = !_sprintPressed; }
+    private void OnLockTarget(InputValue value)
     {
-        if (_rawMoveInput.sqrMagnitude < 0.001f)
-        {
-            _releaseBufferTimer += Time.deltaTime;
-            // Даём 60 мс на перенос пальца между W и S, чтобы не сбрасывать скорость
-            if (_releaseBufferTimer > 0.06f)
-            {
-                _smoothedMoveInput = Vector2.MoveTowards(_smoothedMoveInput, Vector2.zero, _inputSmoothSpeed * 3f * Time.deltaTime);
-            }
-        }
-        else
-        {
-            _releaseBufferTimer = 0f;
+        if (value.isPressed)
+            _targetSelector.ToggleLock();
+    }
 
-            if (_smoothedMoveInput.sqrMagnitude > 0.01f && Vector2.Dot(_smoothedMoveInput.normalized, _rawMoveInput.normalized) < -0.5f)
-            {
-                // Резкий разворот на 180° с сохранением текущей скорости
-                _smoothedMoveInput = _rawMoveInput.normalized * _smoothedMoveInput.magnitude;
-            }
-            else
-            {
-                // Плавный разгон и плавные повороты под углом
-                _smoothedMoveInput = Vector2.MoveTowards(_smoothedMoveInput, _rawMoveInput, _inputSmoothSpeed * Time.deltaTime);
-            }
-        }
+    private void OnTargetLeft(InputValue value)
+    {
+        if (value.isPressed)
+            _targetSelector.SwitchTarget(-1);
+    }
 
-        base.Update();
+    private void OnTargetRight(InputValue value)
+    {
+        if (value.isPressed)
+            _targetSelector.SwitchTarget(1);
     }
 
     // Переопределение виртуальных и абстрактных методов
@@ -100,6 +126,19 @@ public class PlayerController : EntityController
 
     protected override bool IsBattleModeRequested()
     {
-        return _isBattleMode;
+        return _targetSelector != null && _targetSelector.HasTarget;
+    }
+
+    protected override Vector3? GetTargetPosition()
+    {
+        if (_targetSelector != null && _targetSelector.HasTarget)
+            return _targetSelector.CurrentTarget.AimPosition;
+
+        return null;
+    }
+
+    protected override bool HasMoveInput()
+    {
+        return _rawMoveInput.sqrMagnitude > 0.01f;
     }
 }

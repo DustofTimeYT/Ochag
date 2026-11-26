@@ -188,7 +188,7 @@ public abstract class EntityController : MonoBehaviour
     }
 
     // Обработка движения
-
+    string test;
     /// <summary>
     /// Определение вида (шаг/бег/спринт) движения энтити
     /// </summary>
@@ -270,6 +270,10 @@ public abstract class EntityController : MonoBehaviour
         // Перемещаем энтити
         Vector3 movement = dir * speed;
         movement.y = _verticalVelocity;
+        /*
+        string test1 = $"speed={speed} | dirMag={dir.magnitude:F2} | isSprinting={isSprinting} | H={_animator.GetFloat(AnimatorParams.Horizontal):F2} | SprintBool={_animator.GetBool(AnimatorParams.Sprint)}";
+        if (test != test1) Debug.Log(test);
+        test = test1;*/
         _characterController.Move(movement * Time.deltaTime);
     }
 
@@ -308,4 +312,9 @@ public abstract class EntityController : MonoBehaviour
     /// Возвращает мировую позицию текущей цели в боевом режиме (если цель захвачена).
     /// </summary>
     protected virtual Vector3? GetTargetPosition() => null;
+
+    /// <summary>
+    /// Указывает, подаётся ли сейчас активный ввод движения (без учёта сглаживания).
+    /// </summary>
+    protected virtual bool HasMoveInput() => GetMoveDirection().sqrMagnitude > 0.01f;
 }

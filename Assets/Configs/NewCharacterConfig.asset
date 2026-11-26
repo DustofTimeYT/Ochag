@@ -20,5 +20,5 @@ MonoBehaviour:
   _maxHP: 150
   _maxStamina: 100
   _staminaRegen: 3
-  _sprintStaminaCost: 30
+  _sprintStaminaCost: 5
   _staminaRecoveryThreshold: 0.2
