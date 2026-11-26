@@ -24,5 +24,6 @@ namespace Entity
 
         public bool IsSprinting { get; set; } = false;
         public bool IsSprintCooldown { get; set; } = false;
+        public bool IsBattleMode { get; set; } = false;
     }
 }

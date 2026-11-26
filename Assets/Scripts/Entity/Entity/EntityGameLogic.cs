@@ -40,6 +40,11 @@ namespace Entity
         /// <returns><see langword="true"/>, если выносливости хватило; иначе — <see langword="false"/>.</returns>
         public bool TryConsumeSprintStamina(EntitySessionData sessionData, float deltaTime)
         {
+            // Позволяем не тратить стамину вне режима боя
+            if (!sessionData.IsBattleMode)
+                return true;
+
+
             // Уменьшаем стамину во время спринта
             if (sessionData.CurrentStamina > 0 && !sessionData.IsSprintCooldown)
             {

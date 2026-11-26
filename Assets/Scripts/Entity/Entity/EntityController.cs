@@ -13,6 +13,7 @@ public abstract class EntityController : MonoBehaviour
     [SerializeField] protected CharacterController _characterController;
     protected IMoveControl MoveControl { get; private set; }
     protected ITickable Tickable { get; private set; }
+    protected IBattleModeControl BattleModeControl { get; private set; }
 
     [Header("Настройки физики")]
     [SerializeField] private float _gravity = -20f;
@@ -21,6 +22,10 @@ public abstract class EntityController : MonoBehaviour
     [Range(1f, 50f)] [SerializeField] private float _rotationSpeed = 10f;
     private float _verticalVelocity;
     private bool _isPreparingJump;
+
+    [Header("Настройки управления в режиме битвы")]
+
+    private bool _isBattleMode;
 
     [Header("Настройки проверки земли")]
 
@@ -42,10 +47,11 @@ public abstract class EntityController : MonoBehaviour
     private bool _isRawGrounded;
 
     [Inject]
-    public void Init(IMoveControl moveControl, ITickable tickable)
+    public void Init(IMoveControl moveControl, ITickable tickable, IBattleModeControl battleModeControl)
     {
         MoveControl = moveControl;
         Tickable = tickable;
+        BattleModeControl = battleModeControl;
     }
 
     /// <summary>
@@ -91,8 +97,22 @@ public abstract class EntityController : MonoBehaviour
     {
         if (MoveControl == null) return;
 
+        UpdateBattleMode();
+
         Move();
         Jump();
+    }
+
+    // Режим боя
+
+    private void UpdateBattleMode()
+    {
+        bool requested = IsBattleModeRequested();
+        if (_isBattleMode == requested) return;
+
+        _isBattleMode = requested;
+        _animator.SetBool(AnimatorParams.BattleMode, _isBattleMode);
+        BattleModeControl?.SetBattleMode(_isBattleMode);
     }
 
     // Проверка земли
@@ -178,12 +198,12 @@ public abstract class EntityController : MonoBehaviour
 
         if (_isPreparingJump) return;
 
-        if (ConsumeSprintingInput() && dir.sqrMagnitude > 0.01f) // Проверяем нажата ли кнопка спринта и движется ли энтити.
+        if (ConsumeSprintingInput() && dir.sqrMagnitude > 0.01f)
         {
-            if (MoveControl.TrySprint(Time.deltaTime)) // Проверяем хватает ли стамины.
+            if (MoveControl.TrySprint(Time.deltaTime))
             {
                 _animator.SetBool(AnimatorParams.Sprint, true);
-                Move(MoveControl.MaxSprintingSpeed, dir, 1);
+                Move(MoveControl.MaxSprintingSpeed, dir, 1f, true);
                 return;
             }
         }
@@ -191,11 +211,11 @@ public abstract class EntityController : MonoBehaviour
 
         if (ConsumeWalkingInput())
         {
-            Move(MoveControl.MaxWalkingSpeed, dir, 0.2f);
+            Move(MoveControl.MaxWalkingSpeed, dir, 0.2f, false);
         }
         else
         {
-            Move(MoveControl.MaxRunningSpeed, dir, 1);
+            Move(MoveControl.MaxRunningSpeed, dir, 1f, false);
         }
     }
 
@@ -203,21 +223,51 @@ public abstract class EntityController : MonoBehaviour
     /// Для перемещения и поворота энтити на сцене.
     /// </summary>
     /// <param name="speed">Скорость перемещения энтити.</param>
-    /// <param name="stateDir"></param>
-    private void Move(float speed, Vector3 dir, float stateDir)
+    /// <param name="dir">Направление движения в мировых координатах.</param>
+    /// <param name="stateDir">Множитель анимации скорости (0.2 для шага, 1 для бега).</param>
+    /// <param name="isSprinting">Активен ли в данный момент спринт.</param>
+    private void Move(float speed, Vector3 dir, float stateDir, bool isSprinting)
     {
-        // поворачиваем энтити по направлению движения
-        //Vector3 dir = GetMoveDirection();
+        Vector3? targetPos = GetTargetPosition();
 
-        _animator.SetFloat(AnimatorParams.Horizontal, Mathf.Min(Mathf.Abs(dir.z) + Mathf.Abs(dir.x), stateDir)); // неправильная скорость при передвижении боком
-
-        if (dir.sqrMagnitude > 0.01f)
+        if (dir.magnitude < 0.08f)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(dir);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+            dir = Vector3.zero;
         }
 
-        // перемещаем энтити
+        // Стрейфы и фиксация взгляда включаются только в боевом режиме, при наличии цели и без спринта
+        if (_isBattleMode && targetPos.HasValue && !isSprinting)
+        {
+            if (targetPos.HasValue)
+            {
+                Vector3 toTarget = targetPos.Value - transform.position;
+                toTarget.y = 0f;
+                if (toTarget.sqrMagnitude > 0.001f)
+                {
+                    Quaternion targetRotation = Quaternion.LookRotation(toTarget);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+                }
+            }
+
+            Vector3 localDir = transform.InverseTransformDirection(dir) * stateDir;
+            _animator.SetFloat(AnimatorParams.Horizontal, localDir.x);
+            _animator.SetFloat(AnimatorParams.Vertical, localDir.z);
+        }
+        else
+        {
+            // Вне боя или во время спринта поворачиваемся лицом по направлению движения
+            float animSpeed = isSprinting ? 1f : dir.magnitude * stateDir;
+            _animator.SetFloat(AnimatorParams.Horizontal, animSpeed);
+            _animator.SetFloat(AnimatorParams.Vertical, 0f);
+
+            if (dir.sqrMagnitude > 0.01f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(dir);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, _rotationSpeed * Time.deltaTime);
+            }
+        }
+
+        // Перемещаем энтити
         Vector3 movement = dir * speed;
         movement.y = _verticalVelocity;
         _characterController.Move(movement * Time.deltaTime);
@@ -248,4 +298,14 @@ public abstract class EntityController : MonoBehaviour
     /// </summary>
     /// <returns><see langword="true"/>, если нужно переключиться на спринт; иначе — <see langword="false"/>.</returns>
     protected virtual bool ConsumeSprintingInput() => false;
+
+    /// <summary>
+    /// Определяет, должен ли персонаж находиться в боевом режиме.
+    /// </summary>
+    protected virtual bool IsBattleModeRequested() => false;
+
+    /// <summary>
+    /// Возвращает мировую позицию текущей цели в боевом режиме (если цель захвачена).
+    /// </summary>
+    protected virtual Vector3? GetTargetPosition() => null;
 }

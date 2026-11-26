@@ -37,7 +37,7 @@ public class SceneInstaller : MonoBehaviour, IInstaller
         builder.RegisterValue(characterGameLogic);
         builder.RegisterType(
            typeof(CharacterModel),
-           new[] { typeof(IMoveControl), typeof(ITickable)},
+           new[] { typeof(IMoveControl), typeof(ITickable), typeof(IBattleModeControl) },
            Lifetime.Singleton,
            Reflex.Enums.Resolution.Lazy
        );
