@@ -73,11 +73,7 @@ public class TargetSelector : MonoBehaviour
     {
         ScanTargets();
 
-        if (!HasTarget)
-        {
-            CurrentTarget = GetNearestFromCandidates();
-            return;
-        }
+        if (!HasTarget) return;
 
         if (_candidates.Count <= 1) return;
 

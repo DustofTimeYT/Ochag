@@ -23,6 +23,19 @@ public abstract class EntityConfig : ScriptableObject
     [Range(0f, 50f)][SerializeField] private float _maxJumpHeight = 2f;
     public float MaxJumpHeight => _maxJumpHeight;
 
+    [Header("Настройки уклонения")]
+    [Range(1f, 15f)][SerializeField] private float _dodgeDistance = 4f;
+    public float DodgeDistance => _dodgeDistance;
+
+    [Range(0.1f, 1.5f)][SerializeField] private float _dodgeDuration = 0.35f;
+    public float DodgeDuration => _dodgeDuration;
+
+    [Range(0f, 2f)][SerializeField] private float _dodgeCooldown = 0.2f;
+    public float DodgeCooldown => _dodgeCooldown;
+
+    [Range(0f, 100f)][SerializeField] private float _dodgeStaminaCost = 20f;
+    public float DodgeStaminaCost => _dodgeStaminaCost;
+
     [Header("Общие характеристики")]
     [Min(1)][SerializeField] private int _maxHP = 150;
     public int MaxHP => _maxHP;

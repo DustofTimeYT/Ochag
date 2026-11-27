@@ -14,6 +14,7 @@ public abstract class EntityController : MonoBehaviour
     protected IMoveControl MoveControl { get; private set; }
     protected ITickable Tickable { get; private set; }
     protected IBattleModeControl BattleModeControl { get; private set; }
+    protected IDodgeControl DodgeControl { get; private set; }
 
     [Header("Настройки физики")]
     [SerializeField] private float _gravity = -20f;
@@ -26,6 +27,10 @@ public abstract class EntityController : MonoBehaviour
     [Header("Настройки управления в режиме битвы")]
 
     private bool _isBattleMode;
+    private bool _isDodging;
+    private float _dodgeTimer;
+    private float _dodgeCooldownTimer;
+    private Vector3 _dodgeDirection;
 
     [Header("Настройки проверки земли")]
 
@@ -47,11 +52,12 @@ public abstract class EntityController : MonoBehaviour
     private bool _isRawGrounded;
 
     [Inject]
-    public void Init(IMoveControl moveControl, ITickable tickable, IBattleModeControl battleModeControl)
+    public void Init(IMoveControl moveControl, ITickable tickable, IBattleModeControl battleModeControl, IDodgeControl dodgeControl)
     {
         MoveControl = moveControl;
         Tickable = tickable;
         BattleModeControl = battleModeControl;
+        DodgeControl = dodgeControl;
     }
 
     /// <summary>
@@ -99,6 +105,12 @@ public abstract class EntityController : MonoBehaviour
 
         UpdateBattleMode();
 
+        if (_dodgeCooldownTimer > 0f)
+            _dodgeCooldownTimer -= Time.deltaTime;
+
+        if (UpdateDodge())
+            return;
+
         Move();
         Jump();
     }
@@ -113,6 +125,65 @@ public abstract class EntityController : MonoBehaviour
         _isBattleMode = requested;
         _animator.SetBool(AnimatorParams.BattleMode, _isBattleMode);
         BattleModeControl?.SetBattleMode(_isBattleMode);
+    }
+
+    private bool UpdateDodge()
+    {
+        if (DodgeControl == null) return false;
+
+        if (_isDodging)
+        {
+            _dodgeTimer -= Time.deltaTime;
+
+            float dodgeSpeed = DodgeControl.DodgeDuration > 0f
+                ? DodgeControl.DodgeDistance / DodgeControl.DodgeDuration
+                : 0f;
+
+            Vector3 movement = _dodgeDirection * dodgeSpeed;
+            movement.y = _verticalVelocity;
+            _characterController.Move(movement * Time.deltaTime);
+
+            _verticalVelocity += _gravity * Time.deltaTime;
+
+            if (_dodgeTimer <= 0f)
+            {
+                _isDodging = false;
+                DodgeControl.SetDodging(false);
+                _dodgeCooldownTimer = DodgeControl.DodgeCooldown;
+            }
+
+            return true;
+        }
+
+        if (_isRawGrounded && !_isPreparingJump && _dodgeCooldownTimer <= 0f && ConsumeDodgeInput())
+        {
+            if (DodgeControl.TryStartDodge())
+            {
+                Vector3 inputDir = GetMoveDirection();
+                if (inputDir.sqrMagnitude > 0.01f)
+                {
+                    _dodgeDirection = inputDir.normalized;
+                }
+                else
+                {
+                    Vector3 forward = transform.forward;
+                    forward.y = 0f;
+                    _dodgeDirection = forward.sqrMagnitude > 0.001f ? forward.normalized : Vector3.forward;
+                }
+
+                transform.rotation = Quaternion.LookRotation(_dodgeDirection);
+
+                _isDodging = true;
+                _dodgeTimer = DodgeControl.DodgeDuration;
+                DodgeControl.SetDodging(true);
+
+                _animator.SetBool(AnimatorParams.Sprint, false);
+                _animator.SetTrigger(AnimatorParams.Dodge);
+                return true;
+            }
+        }
+
+        return false;
     }
 
     // Проверка земли
@@ -317,4 +388,10 @@ public abstract class EntityController : MonoBehaviour
     /// Указывает, подаётся ли сейчас активный ввод движения (без учёта сглаживания).
     /// </summary>
     protected virtual bool HasMoveInput() => GetMoveDirection().sqrMagnitude > 0.01f;
+
+    /// <summary>
+    /// Подтверждение переката/уворота от класса-наследника.
+    /// </summary>
+    /// <returns><see langword="true"/>, если нужно совершить перекат/уворот; иначе — <see langword="false"/>.</returns>
+    protected virtual bool ConsumeDodgeInput() => false;
 }

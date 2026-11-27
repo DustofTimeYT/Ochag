@@ -23,6 +23,8 @@ public class PlayerController : EntityController
     private bool _walkPressed = false;
     private bool _sprintPressed = false;
 
+    private bool _dodgePressed;
+
     private Vector2 _rawMoveInput;
     private Vector2 _smoothedMoveInput;
 
@@ -95,6 +97,8 @@ public class PlayerController : EntityController
 
     private void OnLook(InputValue value) => _cameraController.SetLookInput(value.Get<Vector2>());
 
+    private void OnDodge(InputValue value) { if (value.isPressed) _dodgePressed = true; }
+
     private void OnLockTarget(InputValue value)
     {
         if (value.isPressed)
@@ -161,5 +165,12 @@ public class PlayerController : EntityController
     protected override bool HasMoveInput()
     {
         return _rawMoveInput.sqrMagnitude > 0.01f;
+    }
+
+    protected override bool ConsumeDodgeInput()
+    {
+        if (!_dodgePressed) return false;
+        _dodgePressed = false;
+        return true;
     }
 }

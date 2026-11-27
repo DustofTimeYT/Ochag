@@ -8,7 +8,7 @@ using UnityEngine;
 /// </summary>
 /// <typeparam name="TSessionData">Тип данных сессии (наследник <see cref="EntitySessionData"/>).</typeparam>
 /// <typeparam name="TGameLogic">Тип игровой логики (наследник <see cref="EntityGameLogic"/>).</typeparam>
-public abstract class EntityModel<TSessionData, TGameLogic> : IMoveControl, IBattleModeReadonly, IBattleModeControl, ITickable, IHPReadonly
+public abstract class EntityModel<TSessionData, TGameLogic> : IMoveControl, IBattleModeReadonly, IBattleModeControl, ITickable, IHPReadonly, IDodgeControl
     where TSessionData : EntitySessionData
     where TGameLogic : EntityGameLogic
 {
@@ -31,6 +31,13 @@ public abstract class EntityModel<TSessionData, TGameLogic> : IMoveControl, IBat
     public float MaxJumpHeight => _sessionData.MaxJumpHeight;
 
     public bool IsBattleMode => _sessionData.IsBattleMode;
+
+    public float DodgeDistance => _sessionData.DodgeDistance;
+    public float DodgeDuration => _sessionData.DodgeDuration;
+    public float DodgeCooldown => _sessionData.DodgeCooldown;
+
+    public bool TryStartDodge() => _gameLogic.TryStartDodge(_sessionData);
+    public void SetDodging(bool isDodging) => _gameLogic.SetDodging(_sessionData, isDodging);
 
     public void SetBattleMode(bool isBattleMode)
     {

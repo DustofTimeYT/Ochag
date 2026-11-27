@@ -27,7 +27,12 @@ public class SceneInstaller : MonoBehaviour, IInstaller
             MaxSprintingSpeed = characterConfig.MaxSprintingSpeed,
 
             MaxJumpHeight = characterConfig.MaxJumpHeight,
-        };
+
+            DodgeDistance = characterConfig.DodgeDistance,
+            DodgeDuration = characterConfig.DodgeDuration,
+            DodgeCooldown = characterConfig.DodgeCooldown,
+            DodgeStaminaCost = characterConfig.DodgeStaminaCost,
+};
 
         CharacterGameLogic characterGameLogic = new();
 
@@ -37,7 +42,8 @@ public class SceneInstaller : MonoBehaviour, IInstaller
         builder.RegisterValue(characterGameLogic);
         builder.RegisterType(
            typeof(CharacterModel),
-           new[] { typeof(IMoveControl), typeof(ITickable), typeof(IBattleModeControl) },
+           new[] { typeof(IMoveControl), typeof(ITickable),
+               typeof(IBattleModeControl), typeof(IDodgeControl) },
            Lifetime.Singleton,
            Reflex.Enums.Resolution.Lazy
        );

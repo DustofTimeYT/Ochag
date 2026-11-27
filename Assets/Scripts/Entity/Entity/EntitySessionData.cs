@@ -25,5 +25,11 @@ namespace Entity
         public bool IsSprinting { get; set; } = false;
         public bool IsSprintCooldown { get; set; } = false;
         public bool IsBattleMode { get; set; } = false;
+
+        public float DodgeDistance { get; set; }
+        public float DodgeDuration { get; set; }
+        public float DodgeCooldown { get; set; }
+        public float DodgeStaminaCost { get; set; }
+        public bool IsDodging { get; set; } = false;
     }
 }

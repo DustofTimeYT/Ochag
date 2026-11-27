@@ -40,23 +40,55 @@ namespace Entity
         /// <returns><see langword="true"/>, если выносливости хватило; иначе — <see langword="false"/>.</returns>
         public bool TryConsumeSprintStamina(EntitySessionData sessionData, float deltaTime)
         {
-            // Позволяем не тратить стамину вне режима боя
-            if (!sessionData.IsBattleMode)
-                return true;
+            if (sessionData.IsSprintCooldown)
+                return false;
 
-
-            // Уменьшаем стамину во время спринта
-            if (sessionData.CurrentStamina > 0 && !sessionData.IsSprintCooldown)
+            float cost = sessionData.SprintStaminaCost * deltaTime;
+            if (TryConsumeStamina(sessionData, cost, requireFullAmount: false))
             {
-                sessionData.CurrentStamina = Math.Max(sessionData.CurrentStamina - sessionData.SprintStaminaCost * deltaTime, 0);
-                sessionData.IsSprinting = true;
+                if (sessionData.IsBattleMode)
+                    sessionData.IsSprinting = true;
+
                 return true;
             }
 
-            // После уменьшения стамины в ноль активируем блокировку спринта
-            if (sessionData.CurrentStamina == 0)
-                sessionData.IsSprintCooldown = true;
+            sessionData.IsSprintCooldown = true;
             return false;
+        }
+
+        /// <summary>
+        /// Пытается потратить выносливость на уклонение (перекат).
+        /// </summary>
+        public bool TryStartDodge(EntitySessionData sessionData)
+        {
+            return TryConsumeStamina(sessionData, sessionData.DodgeStaminaCost, requireFullAmount: true);
+        }
+
+        public void SetDodging(EntitySessionData sessionData, bool isDodging)
+        {
+            sessionData.IsDodging = isDodging;
+        }
+
+        /// <summary>
+        /// Единое правило расхода выносливости: вне боевого режима действия бесплатны.
+        /// </summary>
+        /// <param name="sessionData">Игровые данные сущности.</param>
+        /// <param name="amount">Количество требуемой выносливости.</param>
+        /// <param name="requireFullAmount">Требуется ли полный запас (для рывков/атак) или достаточно остатка > 0 (для потокового спринта).</param>
+        private bool TryConsumeStamina(EntitySessionData sessionData, float amount, bool requireFullAmount)
+        {
+            if (!sessionData.IsBattleMode)
+                return true;
+
+            bool hasEnough = requireFullAmount
+                ? sessionData.CurrentStamina >= amount
+                : sessionData.CurrentStamina > 0f;
+
+            if (!hasEnough)
+                return false;
+
+            sessionData.CurrentStamina = Math.Max(sessionData.CurrentStamina - amount, 0f);
+            return true;
         }
     }
 }
