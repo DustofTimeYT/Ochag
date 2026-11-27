@@ -10,7 +10,9 @@ public class PlayerController : EntityController
 {
     [Header("Ссылки на модули игрока")]
     [SerializeField] private TargetSelector _targetSelector;
+    [SerializeField] private IsometricCameraController _cameraController;
 
+    [Header("Настройки управления игрока")]
     [Tooltip("Скорость плавного разгона и разворота (6–10 — оптимально)")]
     [Range(3f, 25f)][SerializeField] private float _inputSmoothSpeed = 8f;
 
@@ -29,16 +31,15 @@ public class PlayerController : EntityController
     protected override void Awake()
     {
         base.Awake();
-
         if (!enabled) return;
 
-        if (!this.CheckComponent(ref _targetSelector))
+        if (!CheckValidRef())
         {
             enabled = false;
             return;
         }
 
-        _cam = Camera.main.transform;
+        _cam = _cameraController.transform;
     }
 
     protected override void Update()
@@ -69,11 +70,31 @@ public class PlayerController : EntityController
         base.Update();
     }
 
+    // Вспомогательные методы
+
+    /// <summary>
+    /// Проверяет наличие всех обязательных ссылок на компоненты.
+    /// </summary>
+    /// <returns><see langword="true"/>, если все ссылки на компоненты найдены; иначе — <see langword="false"/>.</returns>
+    private bool CheckValidRef()
+    {
+        bool isCameraAssigned = _cameraController != null;
+        if (!isCameraAssigned)
+        {
+            Debug.LogError($"Не назначена ссылка на {nameof(IsometricCameraController)} у {name}!", this);
+        }
+
+        return this.CheckComponent(ref _targetSelector) & isCameraAssigned;
+    }
+
     // Получение пользователского ввода
     private void OnMove(InputValue value) => _rawMoveInput = value.Get<Vector2>();
     private void OnJump(InputValue value) { if (value.isPressed) _jumpPressed = true; }
     private void OnWalk(InputValue value) => _walkPressed = value.isPressed;
     private void OnSprint(InputValue value) { if (value.isPressed) _sprintPressed = !_sprintPressed; }
+
+    private void OnLook(InputValue value) => _cameraController.SetLookInput(value.Get<Vector2>());
+
     private void OnLockTarget(InputValue value)
     {
         if (value.isPressed)
